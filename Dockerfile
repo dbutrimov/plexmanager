@@ -5,4 +5,4 @@ WORKDIR /plexmanager
 COPY requirements.txt /plexmanager/
 RUN pip install -r requirements.txt
 COPY . /plexmanager/
-RUN python manage.py migrate
+RUN chmod +x run.sh
