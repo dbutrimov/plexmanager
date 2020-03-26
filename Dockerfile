@@ -3,7 +3,7 @@ ENV PYTHONUNBUFFERED 1
 RUN mkdir /plexmanager
 WORKDIR /plexmanager
 COPY requirements.txt /plexmanager/
-RUN pip install -r requirements.txt && rm requirements.txt
+RUN pip install -r requirements.txt
 COPY . /plexmanager/
-RUN chmod +x docker-entrypoint.sh
+RUN chmod +x docker-entrypoint.sh && rm requirements.txt
 ENTRYPOINT ["/plexmanager/docker-entrypoint.sh"]
