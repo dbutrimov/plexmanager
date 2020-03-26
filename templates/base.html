@@ -1,0 +1,52 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+<link rel="stylesheet" href="{% static 'noty/noty.css' %}">
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'images/plex.svg' %}" width="30" height="30" class="d-inline-block align-top mr-2"
+                 alt="">
+            Plex Manager
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link active" href="{% url 'movies' %}">Movies</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div style="margin-top: 80px; margin-bottom: 80px;">
+    <div class="container">
+        {% block page_content %}{% endblock %}
+    </div>
+</div>
+
+<script defer src="{% static 'fontawesome/js/all.min.js' %}"></script>
+<script src="{% static 'bootstrap/js/jquery.min.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'noty/noty.min.js' %}"></script>
+
+<script>
+    function notify(type, text) {
+        new Noty({
+            type: type,
+            layout: 'topRight',
+            theme: 'bootstrap-v4',
+            text: text,
+            timeout: 3000,
+            progressBar: true,
+            closeWith: 'click',
+        }).show();
+    }
+</script>
+
+{% block javascript %}{% endblock %}

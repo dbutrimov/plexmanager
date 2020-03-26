@@ -1,0 +1,21 @@
+{% if items|length <= 0 %}
+    <div class="alert alert-primary" role="alert">
+        <i class="fas fa-info-circle"></i> There is no content to view...
+    </div>
+{% else %}
+    <ul class="nav justify-content-end mb-3">
+        <li class="nav-item">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmRenameAll">
+                Rename All
+            </button>
+        </li>
+    </ul>
+
+    {% for item in items %}
+        <div class="collapse show" id="item_{{ item.id }}">
+            <div class="card mb-3">
+                {% include "movies/card.html" %}
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}

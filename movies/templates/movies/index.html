@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+    <!-- Confirm -->
+    <div class="modal fade" id="confirmRenameAll" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Confirm</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to rename all movies?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="rename_all();">Rename</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="content">
+        {% include "movies/cards.html" %}
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        function rename(id) {
+            $.ajax({
+                url: "{% url 'rename' id='00000' %}".replace('00000', id),
+                success: function (response) {
+                    notify('success', '<i class="fas fa-check"></i> Movie successfully renamed!');
+
+                    let item_id = '#item_' + id;
+                    $(item_id).html(response);
+                    $(item_id).collapse('hide');
+                },
+                error: function (response) {
+                    notify('error', '<i class="fas fa-bug"></i> Failed to rename movie!');
+                }
+            });
+        }
+
+        function rename_all() {
+            $('#confirmRenameAll').modal('hide');
+            $.ajax({
+                url: "{% url 'rename_all' %}",
+                success: function (response) {
+                    notify('success', '<i class="fas fa-check"></i> Movies successfully renamed!');
+
+                    $('#content').html(response);
+                },
+                error: function (response) {
+                    notify('error', '<i class="fas fa-bug"></i> Failed to rename movies!');
+                }
+            });
+        }
+    </script>
+{% endblock %}
