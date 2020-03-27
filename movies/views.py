@@ -8,7 +8,7 @@ import re
 import logging
 import requests
 
-logger = logging.getLogger('movies')
+logger = logging.getLogger(__name__)
 
 
 def parse_quality(title):
