@@ -1,9 +1,36 @@
 {% load static %}
 
-<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
-<link rel="stylesheet" href="{% static 'noty/noty.css' %}">
-<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<head>
+    <title>{% block page_title %}{% endblock %}</title>
 
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}"/>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'noty/noty.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <script defer src="{% static 'fontawesome/js/all.min.js' %}"></script>
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'noty/noty.min.js' %}"></script>
+
+    <script>
+        function notify(type, text) {
+            new Noty({
+                type: type,
+                layout: 'topRight',
+                theme: 'bootstrap-v4',
+                text: text,
+                timeout: 3000,
+                progressBar: true,
+                closeWith: 'click',
+            }).show();
+        }
+    </script>
+
+    {% block javascript %}{% endblock %}
+</head>
+<body>
 <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
     <div class="container">
         <a class="navbar-brand" href="#">
@@ -29,24 +56,4 @@
         {% block page_content %}{% endblock %}
     </div>
 </div>
-
-<script defer src="{% static 'fontawesome/js/all.min.js' %}"></script>
-<script src="{% static 'jquery/jquery.min.js' %}"></script>
-<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<script src="{% static 'noty/noty.min.js' %}"></script>
-
-<script>
-    function notify(type, text) {
-        new Noty({
-            type: type,
-            layout: 'topRight',
-            theme: 'bootstrap-v4',
-            text: text,
-            timeout: 3000,
-            progressBar: true,
-            closeWith: 'click',
-        }).show();
-    }
-</script>
-
-{% block javascript %}{% endblock %}
+</body>
