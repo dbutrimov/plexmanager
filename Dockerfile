@@ -3,7 +3,8 @@ ENV PYTHONUNBUFFERED 1
 RUN mkdir /plexmanager
 WORKDIR /plexmanager
 COPY requirements.txt /plexmanager/
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -U pip && \
+    pip install --no-cache-dir -r requirements.txt
 COPY . /plexmanager/
 RUN chmod +x entrypoint.sh
 ENTRYPOINT ["/plexmanager/entrypoint.sh"]
