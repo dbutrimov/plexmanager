@@ -128,3 +128,5 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, "staticfiles"),
 # ]
+
+DEFAULT_CHARSET = env.str('DEFAULT_CHARSET', default='utf-8')
