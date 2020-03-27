@@ -1,7 +1,14 @@
+import os
+
 import environ
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 env = environ.Env()
-environ.Env.read_env()  # reading .env file
+
+env_file = os.path.join(BASE_DIR, '.env')
+if os.path.isfile(env_file):
+    environ.Env.read_env(env_file=env_file)  # reading .env file
 
 DEBUG = env.bool('DEBUG', default=False)
 
