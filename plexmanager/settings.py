@@ -53,15 +53,12 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 # Application definition
 
 INSTALLED_APPS = [
-    'whitenoise.runserver_nostatic',
     # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bootstrap',
-    'fontawesome',
     'movies',
 ]
 
@@ -139,10 +136,8 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, "staticfiles"),
 # ]
-
-DEFAULT_CHARSET = env.str('DEFAULT_CHARSET', default='utf-8')
