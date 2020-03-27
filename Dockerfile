@@ -5,5 +5,5 @@ WORKDIR /plexmanager
 COPY requirements.txt /plexmanager/
 RUN pip install -r requirements.txt
 COPY . /plexmanager/
-RUN chmod +x docker-entrypoint.sh
-ENTRYPOINT ["/plexmanager/docker-entrypoint.sh"]
+RUN chmod +x entrypoint.sh
+ENTRYPOINT ["/plexmanager/entrypoint.sh"]

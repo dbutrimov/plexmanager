@@ -32,6 +32,15 @@ def get_syno_data(response):
     return content.get('data')
 
 
+def raise_syno_error(response):
+    response.raise_for_status()
+
+    content = response.json()
+    if not content.get('success'):
+        error = content.get('error')
+        raise Exception('SYNO.ErrorCode: {0}'.format(error.get('code')))
+
+
 def syno_auth(session):
     response = session.get(
         settings.SYNO_URL + 'auth.cgi',
@@ -77,19 +86,20 @@ def rename(request, id):
         syno_sid = syno_auth(syno_session)
         request.session['syno_sid'] = syno_sid
 
-    response = syno_session.get(
-        settings.SYNO_URL + 'entry.cgi',
-        params={
-            'api': 'SYNO.FileStation.Rename',
-            'version': 2,
-            'method': 'rename',
-            'path': movie['source_file']['path'],
-            'name': movie['target_file']['name'],
-            'additional': 'real_path',
-            '_sid': syno_sid,
-        })
+    if not settings.DEBUG:
+        response = syno_session.get(
+            settings.SYNO_URL + 'entry.cgi',
+            params={
+                'api': 'SYNO.FileStation.Rename',
+                'version': 2,
+                'method': 'rename',
+                'path': movie['source_file']['path'],
+                'name': movie['target_file']['name'],
+                'additional': 'real_path',
+                '_sid': syno_sid,
+            })
 
-    data = get_syno_data(response)
+        raise_syno_error(response)
 
     movie['source_file'] = movie['target_file']
     movie['state'] = 1
@@ -138,19 +148,20 @@ def rename_all(request):
         syno_sid = syno_auth(syno_session)
         request.session['syno_sid'] = syno_sid
 
-    response = syno_session.get(
-        settings.SYNO_URL + 'entry.cgi',
-        params={
-            'api': 'SYNO.FileStation.Rename',
-            'version': 2,
-            'method': 'rename',
-            'path': paths,
-            'name': names,
-            'additional': 'real_path',
-            '_sid': syno_sid,
-        })
+    if not settings.DEBUG:
+        response = syno_session.get(
+            settings.SYNO_URL + 'entry.cgi',
+            params={
+                'api': 'SYNO.FileStation.Rename',
+                'version': 2,
+                'method': 'rename',
+                'path': paths,
+                'name': names,
+                'additional': 'real_path',
+                '_sid': syno_sid,
+            })
 
-    data = get_syno_data(response)
+        raise_syno_error(response)
 
     request.session['movies'] = movies
 
