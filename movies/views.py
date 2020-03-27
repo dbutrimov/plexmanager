@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from django.shortcuts import render
 from plexapi.server import PlexServer
 
@@ -72,7 +74,7 @@ def rename(request, id):
     if index < 0 or not movie:
         raise FileNotFoundError('id: ' + id)
 
-    if movie_extras.validate(movie):
+    if movie_extras.validate_movie(movie):
         return render(request, 'movies/card.html', {'item': movie})
 
     syno_session = requests.Session()
@@ -118,7 +120,7 @@ def rename_all(request):
     index = 0
     while index < len(movies):
         movie = movies[index]
-        if movie_extras.validate(movie):
+        if movie_extras.validate_movie(movie):
             index += 1
             continue
 
@@ -162,7 +164,7 @@ def rename_all(request):
 
     context = {
         'items': movies,
-        'invalid_count': len([m for m in movies if not movie_extras.validate(m)])
+        'invalid_count': len([m for m in movies if not movie_extras.validate_movie(m)])
     }
 
     return render(request, 'movies/cards.html', context)
@@ -205,7 +207,7 @@ def movies(request):
     movies = list()
 
     section = plex.library.section(settings.PLEX_SECTION)
-    for item in section.search():
+    for item in section.search(sort='addedAt:desc'):
         for media in item.media:
             parts_count = len(media.parts)
             for i, part in enumerate(media.parts):
@@ -247,13 +249,14 @@ def movies(request):
                     'thumb': item.thumbUrl,
                     'title': item.title,
                     'year': item.year,
+                    'added': item.addedAt.replace(tzinfo=timezone.utc).timestamp(),
                     'quality': quality,
                     'path': file_path,
                     'valid_path': valid_file_path,
                     'warnings': warnings
                 }
 
-                is_valid = movie_extras.validate(movie)
+                is_valid = movie_extras.validate_movie(movie)
                 if items_filter and items_filter == 'invalid' and is_valid:
                     continue
 

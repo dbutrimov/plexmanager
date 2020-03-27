@@ -1,29 +1,31 @@
 {% load movie_extras %}
 
-<div class="row no-gutters">
-    <div class="card-img cover"
-         style="width: 120px; height: 180px; background-image: url('{{ item.thumb }}');">
-    </div>
-    <div class="card-body">
-        <h5 class="card-title">{{ item.title }} ({{ item.year }})</h5>
-        {% if item|validate %}
-            <p class="card-text">
-                {{ item.path|filename }}
-                {% if 'no_quality' in item.warnings %}
-                    <span class="badge badge-warning">no quality</span>
-                {% endif %}
-            </p>
-        {% else %}
-            <p class="card-text">
-                {{ item.path|filename }}<br/>
-                {{ item.valid_path|filename }}
-                {% if 'no_quality' in item.warnings %}
-                    <span class="badge badge-warning">no quality</span>
-                {% endif %}
-            </p>
-            <button type="button" class="btn btn-primary" onclick="rename({{ item.id }});">
-                Rename
-            </button>
-        {% endif %}
+<div class="card mb-3">
+    <div class="row no-gutters">
+        <div class="card-img cover"
+             style="width: 120px; height: 180px; background-image: url('{{ item.thumb }}');">
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">{{ item.title }} ({{ item.year }})</h5>
+            {% if item|validate_movie %}
+                <p class="card-text">
+                    {{ item.path|filename }}
+                    {% if 'no_quality' in item.warnings %}
+                        <span class="badge badge-warning">no quality</span>
+                    {% endif %}
+                </p>
+            {% else %}
+                <p class="card-text">
+                    {{ item.path|filename }}<br/>
+                    {{ item.valid_path|filename }}
+                    {% if 'no_quality' in item.warnings %}
+                        <span class="badge badge-warning">no quality</span>
+                    {% endif %}
+                </p>
+                <button type="button" class="btn btn-primary" onclick="rename({{ item.id }});">
+                    Rename
+                </button>
+            {% endif %}
+        </div>
     </div>
 </div>

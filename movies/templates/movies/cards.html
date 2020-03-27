@@ -20,7 +20,7 @@
     <li class="nav-item">
         <button type="button" class="btn btn-primary"
                 data-toggle="modal" data-target="#confirmRenameAll"
-                disabled="{% if invalid_count > 0 %}false{% else %}true{% endif %}">
+                {% if invalid_count <= 0 %}disabled{% endif %}>
             Rename All
         </button>
     </li>
@@ -33,9 +33,7 @@
 {% else %}
     {% for item in items %}
         <div class="collapse show" id="item_{{ item.id }}">
-            <div class="card mb-3">
-                {% include "movies/card.html" %}
-            </div>
+            {% include "movies/card.html" %}
         </div>
     {% endfor %}
 {% endif %}

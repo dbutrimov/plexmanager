@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from django import template
 
@@ -16,5 +17,14 @@ def dirname(path):
 
 
 @register.filter
-def validate(movie):
+def validate_movie(movie):
     return movie['path'] == movie['valid_path']
+
+
+@register.filter
+def unix_date(value, format):
+    dt = datetime.utcfromtimestamp(value)
+    if not format or len(format) <= 0:
+        format = '%c'
+
+    return dt.strftime(format)

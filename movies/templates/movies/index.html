@@ -40,7 +40,10 @@
 
                     let item_id = '#item_' + id;
                     $(item_id).html(response);
-                    $(item_id).collapse('hide');
+
+                    {% if request.GET.filter|lower == 'invalid' %}
+                        $(item_id).collapse('hide');
+                    {% endif %}
                 },
                 error: function (response) {
                     notify('error', '<i class="fas fa-bug"></i> Failed to rename movie!');
