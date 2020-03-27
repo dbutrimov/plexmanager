@@ -2,6 +2,7 @@ from django.shortcuts import render
 from plexapi.server import PlexServer
 
 from movies import settings
+from movies.templatetags import movie_extras
 import os
 import jinja2
 import re
@@ -71,7 +72,7 @@ def rename(request, id):
     if index < 0 or not movie:
         raise FileNotFoundError('id: ' + id)
 
-    if movie['state'] != 0:
+    if movie_extras.validate(movie):
         return render(request, 'movies/card.html', {'item': movie})
 
     syno_session = requests.Session()
@@ -89,16 +90,15 @@ def rename(request, id):
                 'api': 'SYNO.FileStation.Rename',
                 'version': 2,
                 'method': 'rename',
-                'path': movie['source_file']['path'],
-                'name': movie['target_file']['name'],
+                'path': movie['path'],
+                'name': movie_extras.filename(movie['valid_path']),
                 'additional': 'real_path',
                 '_sid': syno_sid,
             })
 
         raise_syno_error(response)
 
-    movie['source_file'] = movie['target_file']
-    movie['state'] = 1
+    movie['path'] = movie['valid_path']
 
     movies.pop(index)
 
@@ -118,15 +118,14 @@ def rename_all(request):
     index = 0
     while index < len(movies):
         movie = movies[index]
-        if movie['state'] != 0:
+        if movie_extras.validate(movie):
             index += 1
             continue
 
-        paths.append(movie['source_file']['path'])
-        names.append(movie['target_file']['name'])
+        paths.append(movie['path'])
+        names.append(movie_extras.filename(movie['valid_path']))
 
-        movie['source_file'] = movie['target_file']
-        movie['state'] = 1
+        movie['path'] = movie['valid_path']
 
         movies.pop(index)
 
@@ -161,11 +160,16 @@ def rename_all(request):
 
     request.session['movies'] = movies
 
-    return render(request, 'movies/cards.html', {'items': movies})
+    context = {
+        'items': movies,
+        'invalid_count': len([m for m in movies if not movie_extras.validate(m)])
+    }
+
+    return render(request, 'movies/cards.html', context)
 
 
 def movies(request):
-    filter = request.GET.get('filter')
+    items_filter = request.GET.get('filter')
 
     syno_session = requests.Session()
     syno_session.headers['Accept'] = 'application/json'
@@ -197,20 +201,20 @@ def movies(request):
 
     plex = PlexServer(settings.PLEX_URL, settings.PLEX_TOKEN)
 
-    items = list()
+    invalid_count = 0
+    movies = list()
 
     section = plex.library.section(settings.PLEX_SECTION)
-    for movie in section.search():
-        for media in movie.media:
+    for item in section.search():
+        for media in item.media:
             parts_count = len(media.parts)
             for i, part in enumerate(media.parts):
-                real_file_path = part.file
+                file_path = part.file
 
-                _, file_extension = os.path.splitext(real_file_path)
-                file_name = os.path.basename(real_file_path)
+                _, file_extension = os.path.splitext(file_path)
+                file_name = os.path.basename(file_path)
 
-                real_dir_name = os.path.dirname(real_file_path)
-                dir_name = real_dir_name
+                dir_name = os.path.dirname(file_path)
                 for key, value in shares_map.items():
                     if dir_name.startswith(key):
                         dir_name = value + dir_name[len(key):]
@@ -225,51 +229,44 @@ def movies(request):
                     warnings.append('no_quality')
 
                 render_context = {
-                    'movie': movie,
+                    'movie': item,
                     'media': media,
                     'part': part,
                     'quality': quality,
                 }
 
-                new_file_name = template.render(render_context)
+                valid_file_name = template.render(render_context)
                 if parts_count > 1:
-                    new_file_name = '{0}.part{1}'.format(new_file_name, i + 1)
+                    valid_file_name = '{0}.part{1}'.format(valid_file_name, i + 1)
 
-                new_file_name = '{0}{1}'.format(new_file_name, file_extension)
-                new_real_file_path = os.path.join(real_dir_name, new_file_name)
+                valid_file_name = '{0}{1}'.format(valid_file_name, file_extension)
+                valid_file_path = os.path.join(dir_name, valid_file_name)
 
-                state = 0
-                if new_real_file_path == real_file_path:
-                    state = 1
-                    if filter != 'all':
-                        continue
-
-                item = {
+                movie = {
                     'id': part.id,
-                    'thumb': movie.thumbUrl,
-                    'title': movie.title,
-                    'year': movie.year,
+                    'thumb': item.thumbUrl,
+                    'title': item.title,
+                    'year': item.year,
                     'quality': quality,
-                    'state': state,
-                    'source_file': {
-                        'real_path': real_file_path,
-                        'real_dir': real_dir_name,
-                        'path': file_path,
-                        'dir': dir_name,
-                        'name': file_name,
-                    },
-                    'target_file': {
-                        'real_path': new_real_file_path,
-                        'real_dir': real_dir_name,
-                        'path': os.path.join(dir_name, new_file_name),
-                        'dir': dir_name,
-                        'name': new_file_name,
-                    },
+                    'path': file_path,
+                    'valid_path': valid_file_path,
                     'warnings': warnings
                 }
 
-                items.append(item)
+                is_valid = movie_extras.validate(movie)
+                if items_filter and items_filter == 'invalid' and is_valid:
+                    continue
 
-    request.session['movies'] = items
+                if not is_valid:
+                    invalid_count += 1
 
-    return render(request, 'movies/index.html', {'items': items})
+                movies.append(movie)
+
+    request.session['movies'] = movies
+
+    context = {
+        'items': movies,
+        'invalid_count': invalid_count
+    }
+
+    return render(request, 'movies/index.html', context)

@@ -1,20 +1,22 @@
+{% load movie_extras %}
+
 <div class="row no-gutters">
     <div class="card-img cover"
          style="width: 120px; height: 180px; background-image: url('{{ item.thumb }}');">
     </div>
     <div class="card-body">
         <h5 class="card-title">{{ item.title }} ({{ item.year }})</h5>
-        {% if item.state > 0 %}
+        {% if item|validate %}
             <p class="card-text">
-                {{ item.source_file.name }}
+                {{ item.path|filename }}
                 {% if 'no_quality' in item.warnings %}
                     <span class="badge badge-warning">no quality</span>
                 {% endif %}
             </p>
         {% else %}
             <p class="card-text">
-                {{ item.source_file.name }}<br/>
-                {{ item.target_file.name }}
+                {{ item.path|filename }}<br/>
+                {{ item.valid_path|filename }}
                 {% if 'no_quality' in item.warnings %}
                     <span class="badge badge-warning">no quality</span>
                 {% endif %}

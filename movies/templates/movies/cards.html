@@ -1,16 +1,36 @@
+<ul class="nav justify-content-between mb-3">
+    <li class="nav-item dropdown">
+        <button class="btn btn-light dropdown-toggle" type="button" id="filterButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% if request.GET.filter|lower == 'invalid' %}
+                Invalid Movies
+            {% else %}
+                All Movies
+            {% endif %}
+        </button>
+        <div class="dropdown-menu" aria-labelledby="filterButton">
+            {% if request.GET.filter|lower == 'invalid' %}
+                <a class="dropdown-item" href="{% url 'movies' %}">All Movies</a>
+            {% else %}
+                <a class="dropdown-item" href="{% url 'movies' %}?filter=invalid">Invalid Movies</a>
+            {% endif %}
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <button type="button" class="btn btn-primary"
+                data-toggle="modal" data-target="#confirmRenameAll"
+                disabled="{% if invalid_count > 0 %}false{% else %}true{% endif %}">
+            Rename All
+        </button>
+    </li>
+</ul>
+
 {% if items|length <= 0 %}
     <div class="alert alert-primary" role="alert">
         <i class="fas fa-info-circle"></i> There is no content to view...
     </div>
 {% else %}
-    <ul class="nav justify-content-end mb-3">
-        <li class="nav-item">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmRenameAll">
-                Rename All
-            </button>
-        </li>
-    </ul>
-
     {% for item in items %}
         <div class="collapse show" id="item_{{ item.id }}">
             <div class="card mb-3">
