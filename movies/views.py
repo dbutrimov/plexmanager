@@ -21,17 +21,6 @@ def parse_quality(title):
     return ''
 
 
-def get_syno_data(response):
-    response.raise_for_status()
-
-    content = response.json()
-    if not content.get('success'):
-        error = content.get('error')
-        raise Exception('SYNO.ErrorCode: {0}'.format(error.get('code')))
-
-    return content.get('data')
-
-
 def raise_syno_error(response):
     response.raise_for_status()
 
@@ -39,6 +28,13 @@ def raise_syno_error(response):
     if not content.get('success'):
         error = content.get('error')
         raise Exception('SYNO.ErrorCode: {0}'.format(error.get('code')))
+
+    return content
+
+
+def get_syno_data(response):
+    content = raise_syno_error(response)
+    return content.get('data')
 
 
 def syno_auth(session):
