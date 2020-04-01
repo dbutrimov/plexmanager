@@ -32,6 +32,24 @@
 
 {% block javascript %}
     <script>
+        function sync() {
+            $('#btn-sync').attr("disabled", true);
+            $.ajax({
+                url: "{% url 'sync' %}?filter={{ request.GET.filter }}",
+                success: function (response) {
+                    notify('success', '<i class="fas fa-check"></i> The data successfully synced!');
+
+                    $('#content').html(response);
+                    $('#btn-sync').attr("disabled", false);
+                },
+                error: function (response) {
+                    notify('error', '<i class="fas fa-bug"></i> Failed to sync data!');
+
+                    $('#btn-sync').attr("disabled", false);
+                }
+            });
+        }
+
         function rename(id) {
             $.ajax({
                 url: "{% url 'rename' id='00000' %}".replace('00000', id),
@@ -54,7 +72,7 @@
         function rename_all() {
             $('#confirmRenameAll').modal('hide');
             $.ajax({
-                url: "{% url 'rename_all' %}",
+                url: "{% url 'rename_all' %}?filter={{ request.GET.filter }}",
                 success: function (response) {
                     notify('success', '<i class="fas fa-check"></i> Movies successfully renamed!');
 

@@ -3,22 +3,22 @@
 <div class="card mb-3">
     <div class="row no-gutters">
         <div class="card-img cover"
-             style="width: 120px; height: 180px; background-image: url('{{ item.thumb }}');">
+             style="width: 120px; height: 180px; background-image: url('{{ item.media.movie.thumb }}');">
         </div>
         <div class="card-body">
-            <h5 class="card-title">{{ item.title }} ({{ item.year }})</h5>
-            {% if item|validate_movie %}
+            <h5 class="card-title">{{ item.media.movie.title }} ({{ item.media.movie.year }})</h5>
+            {% if item|has_best_path %}
                 <p class="card-text">
                     {{ item.path|filename }}
-                    {% if 'no_quality' in item.warnings %}
+                    {% if item|quality|length <= 0 %}
                         <span class="badge badge-warning">no quality</span>
                     {% endif %}
                 </p>
             {% else %}
                 <p class="card-text">
                     {{ item.path|filename }}<br/>
-                    {{ item.valid_path|filename }}
-                    {% if 'no_quality' in item.warnings %}
+                    {{ item.best_path|filename }}
+                    {% if item|quality|length <= 0 %}
                         <span class="badge badge-warning">no quality</span>
                     {% endif %}
                 </p>

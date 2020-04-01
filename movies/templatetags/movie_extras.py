@@ -3,6 +3,8 @@ from datetime import datetime
 
 from django import template
 
+from movies.library import parse_quality
+
 register = template.Library()
 
 
@@ -17,8 +19,18 @@ def dirname(path):
 
 
 @register.filter
-def validate_movie(movie):
-    return movie['path'] == movie['valid_path']
+def has_best_path(part):
+    return part.path == part.best_path
+
+
+@register.filter
+def quality(part):
+    return parse_quality(part.path)
+
+
+@register.filter
+def invalid_count(items):
+    return len([item for item in items if not has_best_path(item)])
 
 
 @register.filter

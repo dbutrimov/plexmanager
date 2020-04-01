@@ -1,3 +1,5 @@
+{% load movie_extras %}
+
 <ul class="nav justify-content-between mb-3">
     <li class="nav-item dropdown">
         <button class="btn btn-light dropdown-toggle" type="button" id="filterButton"
@@ -18,9 +20,10 @@
     </li>
 
     <li class="nav-item">
+        <button id="btn-sync" type="button" class="btn btn-success" onclick="sync()">Sync</button>
         <button type="button" class="btn btn-primary"
                 data-toggle="modal" data-target="#confirmRenameAll"
-                {% if invalid_count <= 0 %}disabled{% endif %}>
+                {% if items|invalid_count <= 0 %}disabled{% endif %}>
             Rename All
         </button>
     </li>
