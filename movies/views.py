@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.db import models, transaction
 from django.shortcuts import render
 
@@ -9,6 +10,7 @@ import logging
 import requests
 
 logger = logging.getLogger(__name__)
+page_size = 20
 
 
 def rename(request, id):
@@ -79,6 +81,7 @@ def rename_all(request):
                 raise_syno_error(response)
 
     items_filter = request.GET.get('filter')
+    page_number = request.GET.get('page', 1)
 
     items = MediaPart.objects.order_by('-media__movie__added_at')
     if items_filter == 'invalid':
@@ -86,8 +89,11 @@ def rename_all(request):
     else:
         items = items.all()
 
+    paginator = Paginator(items, page_size)
+    page = paginator.get_page(page_number)
+
     context = {
-        'items': items,
+        'items': page,
     }
 
     return render(request, 'movies/cards.html', context)
@@ -95,6 +101,7 @@ def rename_all(request):
 
 def sync(request):
     items_filter = request.GET.get('filter')
+    page_number = request.GET.get('page', 1)
 
     sync_library(force=True)
 
@@ -104,8 +111,11 @@ def sync(request):
     else:
         items = items.all()
 
+    paginator = Paginator(items, page_size)
+    page = paginator.get_page(page_number)
+
     context = {
-        'items': items,
+        'items': page,
     }
 
     return render(request, 'movies/cards.html', context)
@@ -113,6 +123,7 @@ def sync(request):
 
 def movies(request):
     items_filter = request.GET.get('filter')
+    page_number = request.GET.get('page', 1)
 
     sync_library()
 
@@ -122,8 +133,11 @@ def movies(request):
     else:
         items = items.all()
 
+    paginator = Paginator(items, page_size)
+    page = paginator.get_page(page_number)
+
     context = {
-        'items': items,
+        'items': page,
     }
 
     return render(request, 'movies/index.html', context)

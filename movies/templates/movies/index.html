@@ -35,7 +35,7 @@
         function sync() {
             $('#btn-sync').attr("disabled", true);
             $.ajax({
-                url: "{% url 'sync' %}?filter={{ request.GET.filter }}",
+                url: "{% url 'sync' %}?{{ request.GET.urlencode }}",
                 success: function (response) {
                     notify('success', '<i class="fas fa-check"></i> The data successfully synced!');
 
@@ -72,7 +72,7 @@
         function rename_all() {
             $('#confirmRenameAll').modal('hide');
             $.ajax({
-                url: "{% url 'rename_all' %}?filter={{ request.GET.filter }}",
+                url: "{% url 'rename_all' %}?{{ request.GET.urlencode }}",
                 success: function (response) {
                     notify('success', '<i class="fas fa-check"></i> Movies successfully renamed!');
 
