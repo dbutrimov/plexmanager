@@ -4,6 +4,7 @@ from django.db import models
 class SynoSession(models.Model):
     account = models.CharField(max_length=50, primary_key=True)
     sid = models.CharField(max_length=255)
+    timestamp = models.DateTimeField(auto_now=True)
 
 
 class LibrarySection(models.Model):

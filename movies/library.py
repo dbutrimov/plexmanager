@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+from datetime import datetime, timedelta
 
 import jinja2
 import requests
@@ -44,7 +45,9 @@ def get_syno_data(response):
 def get_syno_sid(session):
     credentials = SynoSession.objects.filter(account=settings.SYNO_ACCOUNT).first()
     if credentials:
-        return credentials.sid
+        elapsed = datetime.now(tz=utc) - credentials.timestamp.replace(tzinfo=utc)
+        if elapsed < timedelta(hours=3):
+            return credentials.sid
 
     response = session.get(
         settings.SYNO_URL + 'auth.cgi',
