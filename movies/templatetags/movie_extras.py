@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django import template
 
-from movies.library import parse_quality
+from library.library import Library
 
 register = template.Library()
 
@@ -25,7 +25,7 @@ def has_best_path(part):
 
 @register.filter
 def quality(part):
-    return parse_quality(part.path)
+    return Library.parse_quality(part.path)
 
 
 @register.filter

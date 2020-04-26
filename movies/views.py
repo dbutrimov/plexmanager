@@ -2,12 +2,11 @@ from django.core.paginator import Paginator
 from django.db import models, transaction
 from django.shortcuts import render
 
-from movies import settings
-from movies.library import sync_library, get_syno_sid, raise_syno_error
+from library.syno import Syno
+from library.library import Library
 from movies.models import MediaPart
 from movies.templatetags import movie_extras
 import logging
-import requests
 
 logger = logging.getLogger(__name__)
 page_size = 20
@@ -19,24 +18,7 @@ def rename(request, id):
     if part.path == part.best_path:
         return render(request, 'movies/card.html', {'item': part})
 
-    syno_session = requests.Session()
-    syno_session.headers['Accept'] = 'application/json'
-
-    syno_sid = get_syno_sid(syno_session)
-    if not settings.DEBUG:
-        response = syno_session.get(
-            settings.SYNO_URL + 'entry.cgi',
-            params={
-                'api': 'SYNO.FileStation.Rename',
-                'version': 2,
-                'method': 'rename',
-                'path': part.path,
-                'name': movie_extras.filename(part.best_path),
-                'additional': 'real_path',
-                '_sid': syno_sid,
-            })
-
-        raise_syno_error(response)
+    Syno.rename(part.path, movie_extras.filename(part.best_path))
 
     part.path = part.best_path
     part.save()
@@ -61,24 +43,7 @@ def rename_all(request):
             paths = ','.join(paths)
             names = ','.join(names)
 
-            syno_session = requests.Session()
-            syno_session.headers['Accept'] = 'application/json'
-
-            syno_sid = get_syno_sid(syno_session)
-            if not settings.DEBUG:
-                response = syno_session.get(
-                    settings.SYNO_URL + 'entry.cgi',
-                    params={
-                        'api': 'SYNO.FileStation.Rename',
-                        'version': 2,
-                        'method': 'rename',
-                        'path': paths,
-                        'name': names,
-                        'additional': 'real_path',
-                        '_sid': syno_sid,
-                    })
-
-                raise_syno_error(response)
+            Syno.rename(paths, names)
 
     items_filter = request.GET.get('filter')
     page_number = request.GET.get('page', 1)
@@ -103,7 +68,7 @@ def sync(request):
     items_filter = request.GET.get('filter')
     page_number = request.GET.get('page', 1)
 
-    sync_library(force=True)
+    Library.sync(force=True)
 
     items = MediaPart.objects.order_by('-media__movie__added_at')
     if items_filter == 'invalid':
@@ -125,7 +90,7 @@ def movies(request):
     items_filter = request.GET.get('filter')
     page_number = request.GET.get('page', 1)
 
-    sync_library()
+    Library.sync()
 
     items = MediaPart.objects.order_by('-media__movie__added_at')
     if items_filter == 'invalid':
