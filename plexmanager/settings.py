@@ -32,21 +32,38 @@ SECRET_KEY = env.str('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 
-log_level = env.str('LOG_LEVEL', default=None)
-if log_level and len(log_level) > 0:
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-            },
-        },
-        'root': {
-            'handlers': ['console'],
-            'level': log_level,
-        },
+log_handlers = {
+    'console': {
+        'class': 'logging.StreamHandler',
+        'formatter': 'standard',
+    },
+}
+
+LOG_FILENAME = env.str('LOG_FILENAME', default=None)
+if LOG_FILENAME and len(LOG_FILENAME) > 0:
+    log_handlers['file'] = {
+        'class': 'logging.handlers.RotatingFileHandler',
+        'filename': LOG_FILENAME,
+        'maxBytes': 1048576,  # 1MB
+        'backupCount': 5,
+        'formatter': 'standard',
     }
+
+LOG_LEVEL = env.str('LOG_LEVEL', default='WARNING')
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': "%(asctime)s [%(levelname)s] [%(name)s:%(lineno)s] %(message)s",
+        },
+    },
+    'handlers': log_handlers,
+    'root': {
+        'handlers': log_handlers.keys(),
+        'level': LOG_LEVEL,
+    },
+}
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
