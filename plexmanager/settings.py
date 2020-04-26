@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import sys
 
 import environ
 
@@ -35,6 +36,7 @@ DEBUG = env.bool('DEBUG', default=False)
 log_handlers = {
     'console': {
         'class': 'logging.StreamHandler',
+        'stream': sys.stdout,
         'formatter': 'standard',
     },
 }
